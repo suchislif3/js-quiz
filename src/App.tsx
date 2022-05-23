@@ -1,18 +1,12 @@
 import React, { useState } from "react";
 import { ThemeProvider } from "styled-components";
 
-import { fetchQuestions, DifficultyEnum, QuestionObject } from "./api/opentdb";
 import { defaultTheme } from "./themes/defaultTheme";
 import { GlobalStyles } from "./App.styles";
-
+import { fetchQuestions } from "./api/opentdb";
+import { QuestionObject, UserAnswerObject } from "./common/types";
+import { DifficultyEnum } from "./common/enums";
 import QuestionCard from "./components/QuestionCard";
-
-export type AnswerObject = {
-  question: string;
-  answer: string;
-  correct: boolean;
-  correctAnswer: string;
-};
 
 const TOTAL_QUESTIONS: number = 10;
 
@@ -20,14 +14,14 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [questions, setQuestions] = useState<QuestionObject[]>([]);
   const [questionNr, setQuestionNr] = useState<number>(0);
-  const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
+  const [userAnswerObjects, setUserAnswerObjects] = useState<UserAnswerObject[]>([]);
   const [score, setScore] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(true);
 
   const resetGame = (): void => {
     setGameOver(false);
     setQuestionNr(0);
-    setUserAnswers([]);
+    setUserAnswerObjects([]);
     setScore(0);
   };
 
@@ -52,13 +46,13 @@ const App: React.FC = () => {
       const correct: boolean =
         questions[questionNr].correct_answer === userAnswer;
       if (correct) setScore((prev) => prev + 1);
-      const answerObject: AnswerObject = {
+      const userAnswerObject: UserAnswerObject = {
         question: questions[questionNr].question,
         answer: userAnswer,
         correct,
         correctAnswer: questions[questionNr].correct_answer,
       };
-      setUserAnswers((prev) => [...prev, answerObject]);
+      setUserAnswerObjects((prev) => [...prev, userAnswerObject]);
     }
   };
 
@@ -77,7 +71,7 @@ const App: React.FC = () => {
       <GlobalStyles />
       <div className="App">
         <h1>React Quiz</h1>
-        {(gameOver || userAnswers.length === TOTAL_QUESTIONS) && (
+        {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
           <button className="start" onClick={startTrivia}>
             Start
           </button>
@@ -90,13 +84,13 @@ const App: React.FC = () => {
             totalQuestions={TOTAL_QUESTIONS}
             question={questions[questionNr].question}
             answers={questions[questionNr].answers}
-            userAnswer={userAnswers ? userAnswers[questionNr] : undefined}
+            userAnswerObject={userAnswerObjects ? userAnswerObjects[questionNr] : undefined}
             callback={checkAnswer}
           />
         )}
         {!gameOver &&
           !loading &&
-          userAnswers.length === questionNr + 1 &&
+          userAnswerObjects.length === questionNr + 1 &&
           questionNr !== TOTAL_QUESTIONS - 1 && (
             <button className="next" onClick={nextQuestion}>
               Next Question
