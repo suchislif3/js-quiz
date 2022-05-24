@@ -1,11 +1,12 @@
 import { createGlobalStyle } from "styled-components";
 
-export const GlobalStyles = createGlobalStyle`
+export const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: ${({ theme }) => theme.fonts.main};
+    border-radius: ${({ theme }) => theme.borderRadius};
   }
   
   html {
@@ -13,8 +14,8 @@ export const GlobalStyles = createGlobalStyle`
   }
   
   body {
-    background-size: cover;
-    color: ${(props) => props.theme.palette.primary.main};
+    background-color: ${({ theme }) => theme.palette.background.main};
+    color: ${({ theme }) => theme.palette.background.contrastText};
     display: flex;
     justify-content: center;
     padding: 0 20px;

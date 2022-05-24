@@ -1,23 +1,6 @@
 import "styled-components";
-
-interface PaletteInterface {
-  main: string;
-  contrastText: string;
-}
+import { ThemeInterface } from "../src/common/interfaces";
 
 declare module "styled-components" {
-  export interface DefaultTheme {
-    fonts: {
-      main: string;
-    };
-    borderRadius: string;
-    palette: {
-      common: {
-        black: string;
-        white: string;
-      };
-      primary: PaletteInterface;
-      secondary: PaletteInterface;
-    };
-  }
+  export interface DefaultTheme extends ThemeInterface {}
 }

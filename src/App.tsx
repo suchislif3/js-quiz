@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
+import PulseLoader from "react-spinners/PulseLoader";
 
-import { defaultTheme } from "./themes/defaultTheme";
-import { GlobalStyles } from "./App.styles";
+import { light } from "./styles/themes/light";
+import { dark } from "./styles/themes/dark";
+import { GlobalStyle } from "./styles/global.styles";
+import { MainContainer, Title, Score } from "./styles/App.styles";
 import { fetchQuestions } from "./api/opentdb";
 import { QuestionObject, UserAnswerObject } from "./common/types";
 import { DifficultyEnum } from "./common/enums";
+import { ThemeInterface } from "./common/interfaces";
+import Button from "./components/Button";
 import QuestionCard from "./components/QuestionCard";
 
 const TOTAL_QUESTIONS: number = 10;
@@ -14,9 +19,17 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [questions, setQuestions] = useState<QuestionObject[]>([]);
   const [questionNr, setQuestionNr] = useState<number>(0);
-  const [userAnswerObjects, setUserAnswerObjects] = useState<UserAnswerObject[]>([]);
+  const [userAnswerObjects, setUserAnswerObjects] = useState<
+    UserAnswerObject[]
+  >([]);
   const [score, setScore] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(true);
+  const [isDark] = useState<boolean>(true);
+  const [theme, setTheme] = useState<ThemeInterface>(isDark ? dark : light);
+
+  useEffect(() => {
+    setTheme(isDark ? dark : light);
+  }, [isDark]);
 
   const resetGame = (): void => {
     setGameOver(false);
@@ -67,24 +80,27 @@ const App: React.FC = () => {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <GlobalStyles />
-      <div className="App">
-        <h1>React Quiz</h1>
-        {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
-          <button className="start" onClick={startTrivia}>
-            Start
-          </button>
-        )}
-        {!gameOver && <p className="score">Score: {score}</p>}
-        {loading && <p>Loading Questions...</p>}
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <MainContainer>
+        <Title>quiz</Title>
+        
+        {!gameOver && !loading && <Score className="score">score: {score}</Score>}
+        <PulseLoader
+          loading={loading}
+          size={15}
+          css={"margin: 50px auto;"}
+          color={theme.palette.background.contrastText}
+        />
         {!loading && !gameOver && (
           <QuestionCard
             questionNr={questionNr + 1}
             totalQuestions={TOTAL_QUESTIONS}
             question={questions[questionNr].question}
             answers={questions[questionNr].answers}
-            userAnswerObject={userAnswerObjects ? userAnswerObjects[questionNr] : undefined}
+            userAnswerObject={
+              userAnswerObjects ? userAnswerObjects[questionNr] : undefined
+            }
             callback={checkAnswer}
           />
         )}
@@ -92,11 +108,16 @@ const App: React.FC = () => {
           !loading &&
           userAnswerObjects.length === questionNr + 1 &&
           questionNr !== TOTAL_QUESTIONS - 1 && (
-            <button className="next" onClick={nextQuestion}>
-              Next Question
-            </button>
+            <Button callback={nextQuestion}>
+              <span>Next Question</span>
+            </Button>
           )}
-      </div>
+        {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
+          <Button callback={startTrivia}>
+            <span>{userAnswerObjects.length ? "RESTART" : "START"}</span>
+          </Button>
+        )}
+      </MainContainer>
     </ThemeProvider>
   );
 };

@@ -1,5 +1,11 @@
-import React from "react";
-import { UserAnswerObject } from '../common/types'
+import React, { useEffect } from "react";
+import { UserAnswerObject } from "../common/types";
+import {
+  AnswerButton,
+  Container,
+  QuestionNr,
+  Question,
+} from "../styles/QuestionCard.styles";
 
 interface Props {
   question: string;
@@ -17,26 +23,35 @@ const QuestionCard: React.FC<Props> = ({
   userAnswerObject,
   questionNr,
   totalQuestions,
-}) => (
-  <div>
-    <p className="questionNr">
+}) => {
+
+useEffect(() => {
+  console.log('QUESTION CARD RENDER')
+
+  return () => {console.log('LEAVING DOM')}
+},)
+
+return (
+  <Container>
+    <QuestionNr className="questionNr">
       Question: {questionNr} / {totalQuestions}
-    </p>
-    <p dangerouslySetInnerHTML={{ __html: question }} />
+    </QuestionNr>
+    <Question dangerouslySetInnerHTML={{ __html: question }} />
     <div>
       {answers.map((answer) => (
-        <div key={answer}>
-          <button
-            disabled={Boolean(userAnswerObject)}
-            value={answer}
-            onClick={callback}
-          >
-            <span dangerouslySetInnerHTML={{ __html: answer }} />
-          </button>
-        </div>
+        <AnswerButton
+          key={answer}
+          disabled={Boolean(userAnswerObject)}
+          value={answer}
+          onClick={callback}
+          correct={userAnswerObject?.correctAnswer === answer}
+          userClicked={userAnswerObject?.answer === answer}
+        >
+          <span dangerouslySetInnerHTML={{ __html: answer }} />
+        </AnswerButton>
       ))}
     </div>
-  </div>
-);
+  </Container>
+)};
 
 export default QuestionCard;
