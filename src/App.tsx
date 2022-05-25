@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ThemeProvider } from "styled-components";
 import PulseLoader from "react-spinners/PulseLoader";
 
@@ -26,6 +26,8 @@ const App: React.FC = () => {
   const [gameOver, setGameOver] = useState<boolean>(true);
   const [isDark] = useState<boolean>(true);
   const [theme, setTheme] = useState<ThemeInterface>(isDark ? dark : light);
+  const nextBtnRef = useRef<HTMLButtonElement | null>(null);
+  const startBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     setTheme(isDark ? dark : light);
@@ -52,6 +54,17 @@ const App: React.FC = () => {
       console.log(err);
     }
   };
+
+  const scrollToRef = (
+    ref: React.MutableRefObject<HTMLElement | null>
+  ): void => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (nextBtnRef.current) scrollToRef(nextBtnRef);
+    if (startBtnRef.current) scrollToRef(startBtnRef);
+  });
 
   const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>): void => {
     if (!gameOver) {
@@ -110,12 +123,12 @@ const App: React.FC = () => {
           !loading &&
           userAnswerObjects.length === questionNr + 1 &&
           questionNr !== TOTAL_QUESTIONS - 1 && (
-            <Button onClick={nextQuestion}>
+            <Button ref={nextBtnRef} onClick={nextQuestion}>
               <span>Next Question</span>
             </Button>
           )}
         {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
-          <Button onClick={startTrivia}>
+          <Button ref={startBtnRef} onClick={startTrivia}>
             <span>{userAnswerObjects.length ? "RESTART" : "START"}</span>
           </Button>
         )}

@@ -15,7 +15,7 @@ export const Button = styled.button<ButtonProps>`
   width: ${({ answerBtn }) => (answerBtn ? "100%" : "200px")};
   max-width: 90vw;
   height: ${({ answerBtn }) => (answerBtn ? "60px" : "50px")};
-  margin: ${({ answerBtn }) => (answerBtn ? "5px 0" : "5% 0 50px")};
+  margin: ${({ answerBtn }) => (answerBtn ? "5px 0" : "5% 0")};
   position: relative;
   color: ${({ theme }) => theme.palette.background.contrastText};
   background: ${({ theme, correct, userClicked }) =>
