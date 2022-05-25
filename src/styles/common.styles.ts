@@ -7,7 +7,7 @@ interface ButtonProps {
 }
 
 export const Button = styled.button<ButtonProps>`
-  cursor: pointer;
+  cursor: ${({disabled}) => !disabled && "pointer"};
   user-select: none;
   transition: all 0.3s;
   border: none;
@@ -20,9 +20,9 @@ export const Button = styled.button<ButtonProps>`
   color: ${({ theme }) => theme.palette.background.contrastText};
   background: ${({ theme, correct, userClicked }) =>
     correct
-      ? theme.palette.answer.correct
+      ? `${theme.palette.answer.correct}99`
       : userClicked
-      ? theme.palette.answer.wrong
+      ? `${theme.palette.answer.wrong}99`
       : "none"};
 
   span {
@@ -65,24 +65,12 @@ export const Button = styled.button<ButtonProps>`
     height: 100%;
     z-index: 1;
     transition: all 0.3s;
-    background-color: ${({ theme }) =>
-      `${theme.palette.background.contrastText}20`};
+    background-color: ${({ theme, correct, userClicked }) => !correct && !userClicked ?
+      `${theme.palette.background.contrastText}20` : "transparent"};
   }
 
   :hover::after {
     opacity: ${({ disabled }) => !disabled && 0};
     transform: ${({ disabled }) => !disabled && "scale(0, 1)"};
   }
-`;
-
-export const CardWrapper = styled.div`
-  width: 500px;
-  max-width: 90vw;
-  background-color: ${({ theme }) => `${theme.palette.primary.main}20`};
-  padding: 20px 3%;
-  border-top: 3px solid ${({ theme }) => theme.palette.primary.main};
-  border-bottom: 3px solid ${({ theme }) => theme.palette.primary.main};
-  /* box-shadow: 0px 2px 10px
-    ${({ theme }) => `${theme.palette.background.contrastText}75`}; */
-  transition: all 0.5s;
 `;

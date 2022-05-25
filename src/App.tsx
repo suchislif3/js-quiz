@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ThemeProvider } from "styled-components";
 import PulseLoader from "react-spinners/PulseLoader";
+import { MdOutlineLightMode, MdOutlineModeNight } from "react-icons/md";
 
 import { light } from "./styles/themes/light";
 import { dark } from "./styles/themes/dark";
@@ -12,6 +13,7 @@ import { QuestionObject, UserAnswerObject } from "./common/types";
 import { DifficultyEnum } from "./common/enums";
 import { ThemeInterface } from "./common/interfaces";
 import QuestionCard from "./components/QuestionCard";
+import ToggleButton from "./components/ToggleButton";
 
 const TOTAL_QUESTIONS: number = 10;
 
@@ -24,14 +26,13 @@ const App: React.FC = () => {
   >([]);
   const [score, setScore] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(true);
-  const [isDark] = useState<boolean>(true);
-  const [theme, setTheme] = useState<ThemeInterface>(isDark ? dark : light);
+  const [theme, setTheme] = useState<ThemeInterface>(dark);
   const nextBtnRef = useRef<HTMLButtonElement | null>(null);
   const startBtnRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    setTheme(isDark ? dark : light);
-  }, [isDark]);
+  const toggleTheme = (): void => {
+    setTheme((prev) => (prev === dark ? light : dark));
+  };
 
   const resetGame = (): void => {
     setGameOver(false);
@@ -64,7 +65,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (nextBtnRef.current) scrollToRef(nextBtnRef);
     if (startBtnRef.current) scrollToRef(startBtnRef);
-  });
+  }, [userAnswerObjects]);
 
   const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>): void => {
     if (!gameOver) {
@@ -97,7 +98,12 @@ const App: React.FC = () => {
       <GlobalStyle />
       <MainContainer>
         <Title>quiz</Title>
-
+        <ToggleButton
+          callback={toggleTheme}
+          isDark={theme === dark}
+          front={<MdOutlineLightMode />}
+          back={<MdOutlineModeNight />}
+        />
         {!gameOver && !loading && (
           <Score className="score">score: {score}</Score>
         )}
