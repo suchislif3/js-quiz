@@ -1,11 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { UserAnswerObject } from "../common/types";
-import {
-  AnswerButton,
-  Container,
-  QuestionNr,
-  Question,
-} from "../styles/QuestionCard.styles";
+import { Container, QuestionNr, Question } from "../styles/QuestionCard.styles";
+import { Button } from "../styles/common.styles";
 
 interface Props {
   question: string;
@@ -23,15 +19,7 @@ const QuestionCard: React.FC<Props> = ({
   userAnswerObject,
   questionNr,
   totalQuestions,
-}) => {
-
-useEffect(() => {
-  console.log('QUESTION CARD RENDER')
-
-  return () => {console.log('LEAVING DOM')}
-},)
-
-return (
+}) => (
   <Container>
     <QuestionNr className="questionNr">
       Question: {questionNr} / {totalQuestions}
@@ -39,19 +27,20 @@ return (
     <Question dangerouslySetInnerHTML={{ __html: question }} />
     <div>
       {answers.map((answer) => (
-        <AnswerButton
+        <Button
           key={answer}
           disabled={Boolean(userAnswerObject)}
           value={answer}
           onClick={callback}
+          answerBtn
           correct={userAnswerObject?.correctAnswer === answer}
           userClicked={userAnswerObject?.answer === answer}
         >
           <span dangerouslySetInnerHTML={{ __html: answer }} />
-        </AnswerButton>
+        </Button>
       ))}
     </div>
   </Container>
-)};
+);
 
 export default QuestionCard;

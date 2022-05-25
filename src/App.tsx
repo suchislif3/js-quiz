@@ -4,13 +4,13 @@ import PulseLoader from "react-spinners/PulseLoader";
 
 import { light } from "./styles/themes/light";
 import { dark } from "./styles/themes/dark";
-import { GlobalStyle } from "./styles/global.styles";
+import { GlobalStyle } from "./styles/Global.styles";
 import { MainContainer, Title, Score } from "./styles/App.styles";
+import { Button } from "./styles/common.styles";
 import { fetchQuestions } from "./api/opentdb";
 import { QuestionObject, UserAnswerObject } from "./common/types";
 import { DifficultyEnum } from "./common/enums";
 import { ThemeInterface } from "./common/interfaces";
-import Button from "./components/Button";
 import QuestionCard from "./components/QuestionCard";
 
 const TOTAL_QUESTIONS: number = 10;
@@ -84,8 +84,10 @@ const App: React.FC = () => {
       <GlobalStyle />
       <MainContainer>
         <Title>quiz</Title>
-        
-        {!gameOver && !loading && <Score className="score">score: {score}</Score>}
+
+        {!gameOver && !loading && (
+          <Score className="score">score: {score}</Score>
+        )}
         <PulseLoader
           loading={loading}
           size={15}
@@ -108,12 +110,12 @@ const App: React.FC = () => {
           !loading &&
           userAnswerObjects.length === questionNr + 1 &&
           questionNr !== TOTAL_QUESTIONS - 1 && (
-            <Button callback={nextQuestion}>
+            <Button onClick={nextQuestion}>
               <span>Next Question</span>
             </Button>
           )}
         {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
-          <Button callback={startTrivia}>
+          <Button onClick={startTrivia}>
             <span>{userAnswerObjects.length ? "RESTART" : "START"}</span>
           </Button>
         )}
