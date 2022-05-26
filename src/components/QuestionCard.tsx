@@ -1,11 +1,15 @@
 import React from "react";
-import { UserAnswerObject } from "../common/types";
-import { Container, QuestionNr, Question } from "../styles/QuestionCard.styles";
+import { UserAnswerObject, QuestionObject } from "../common/types";
+import {
+  Container,
+  QuestionNr,
+  QuestionProperty,
+  Question,
+} from "../styles/QuestionCard.styles";
 import { Button } from "../styles/common.styles";
 
 interface Props {
-  question: string;
-  answers: string[];
+  questionObject: QuestionObject;
   callback: (e: React.MouseEvent<HTMLButtonElement>) => void;
   userAnswerObject: UserAnswerObject | undefined;
   questionNr: number;
@@ -13,20 +17,21 @@ interface Props {
 }
 
 const QuestionCard: React.FC<Props> = ({
-  question,
-  answers,
+  questionObject,
   callback,
   userAnswerObject,
   questionNr,
   totalQuestions,
 }) => (
   <Container>
-    <QuestionNr className="questionNr">
+    <QuestionNr>
       Question: {questionNr} / {totalQuestions}
     </QuestionNr>
-    <Question dangerouslySetInnerHTML={{ __html: question }} />
+    <QuestionProperty>Category: {questionObject.category}</QuestionProperty>
+    <QuestionProperty>Difficulty: {questionObject.difficulty}</QuestionProperty>
+    <Question dangerouslySetInnerHTML={{ __html: questionObject.question }} />
     <div>
-      {answers.map((answer) => (
+      {questionObject.answers.map((answer) => (
         <Button
           key={answer}
           disabled={Boolean(userAnswerObject)}

@@ -15,3 +15,8 @@ export type FetchedQuestion = {
 };
 
 export type QuestionObject = FetchedQuestion & { answers: string[] };
+
+export type Category = {
+  id: number;
+  name: string;
+};

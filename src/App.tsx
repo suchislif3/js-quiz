@@ -8,17 +8,24 @@ import { dark } from "./styles/themes/dark";
 import { GlobalStyle } from "./styles/Global.styles";
 import { MainContainer, Title, Score } from "./styles/App.styles";
 import { Button } from "./styles/common.styles";
-import { fetchQuestions } from "./api/opentdb";
-import { QuestionObject, UserAnswerObject } from "./common/types";
+import { fetchCategories, fetchQuestions } from "./api/opentdb";
+import { Category, QuestionObject, UserAnswerObject } from "./common/types";
 import { DifficultyEnum } from "./common/enums";
 import { ThemeInterface } from "./common/interfaces";
+import { categoryAll } from "./common/constants";
 import QuestionCard from "./components/QuestionCard";
 import ToggleButton from "./components/ToggleButton";
+import CustomSelect from "./components/CustomSelect";
 
 const TOTAL_QUESTIONS: number = 10;
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [categories, setCategories] = useState<Category[] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+  const [difficulty, setDifficulty] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuestionObject[]>([]);
   const [questionNr, setQuestionNr] = useState<number>(0);
   const [userAnswerObjects, setUserAnswerObjects] = useState<
@@ -41,13 +48,29 @@ const App: React.FC = () => {
     setScore(0);
   };
 
+  useEffect(() => {
+    const getCategories = async (): Promise<void> => {
+      const data: Category[] = await fetchCategories();
+      const allCategories: Category[] = [categoryAll, ...data];
+      setCategories(allCategories);
+      setSelectedCategory(categoryAll);
+    };
+    if (!categories) getCategories();
+    setDifficulty(DifficultyEnum.ALL);
+  }, [categories]);
+
   const startTrivia = async (): Promise<void> => {
     try {
       setLoading(true);
       resetGame();
       const newQuestions: QuestionObject[] = await fetchQuestions(
         TOTAL_QUESTIONS,
-        DifficultyEnum.EASY
+        difficulty === DifficultyEnum.ALL ? null : difficulty,
+        selectedCategory
+          ? selectedCategory?.id === categoryAll.id
+            ? null
+            : selectedCategory.id
+          : null
       );
       setQuestions(newQuestions);
       setLoading(false);
@@ -104,39 +127,52 @@ const App: React.FC = () => {
           front={<MdOutlineLightMode />}
           back={<MdOutlineModeNight />}
         />
-        {!gameOver && !loading && (
-          <Score className="score">score: {score}</Score>
-        )}
         <PulseLoader
           loading={loading}
-          size={15}
+          size={12}
           css={"margin: 50px auto;"}
           color={theme.palette.background.contrastText}
         />
         {!loading && !gameOver && (
-          <QuestionCard
-            questionNr={questionNr + 1}
-            totalQuestions={TOTAL_QUESTIONS}
-            question={questions[questionNr].question}
-            answers={questions[questionNr].answers}
-            userAnswerObject={
-              userAnswerObjects ? userAnswerObjects[questionNr] : undefined
-            }
-            callback={checkAnswer}
-          />
+          <>
+            <Score>score: {score}</Score>
+            <QuestionCard
+              questionNr={questionNr + 1}
+              totalQuestions={TOTAL_QUESTIONS}
+              questionObject={questions[questionNr]}
+              userAnswerObject={
+                userAnswerObjects ? userAnswerObjects[questionNr] : undefined
+              }
+              callback={checkAnswer}
+            />
+            {userAnswerObjects.length === questionNr + 1 &&
+              questionNr !== TOTAL_QUESTIONS - 1 && (
+                <Button ref={nextBtnRef} onClick={nextQuestion}>
+                  <span>Next Question</span>
+                </Button>
+              )}
+          </>
         )}
-        {!gameOver &&
-          !loading &&
-          userAnswerObjects.length === questionNr + 1 &&
-          questionNr !== TOTAL_QUESTIONS - 1 && (
-            <Button ref={nextBtnRef} onClick={nextQuestion}>
-              <span>Next Question</span>
-            </Button>
-          )}
         {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
-          <Button ref={startBtnRef} onClick={startTrivia}>
-            <span>{userAnswerObjects.length ? "RESTART" : "START"}</span>
-          </Button>
+          <>
+            <span>Category:</span>
+            <CustomSelect
+              selected={selectedCategory}
+              options={categories}
+              setSelected={setSelectedCategory}
+              getLabel={(option) => option.name}
+            />
+            <span>Difficulty:</span>
+            <CustomSelect
+              selected={difficulty}
+              options={Object.values(DifficultyEnum)}
+              setSelected={setDifficulty}
+              getLabel={(option) => option}
+            />
+            <Button ref={startBtnRef} onClick={startTrivia}>
+              <span>{userAnswerObjects.length ? "RESTART" : "START"}</span>
+            </Button>
+          </>
         )}
       </MainContainer>
     </ThemeProvider>

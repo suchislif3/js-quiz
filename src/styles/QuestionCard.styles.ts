@@ -13,12 +13,17 @@ export const Container = styled.div`
 
 export const QuestionNr = styled.p`
   color: ${({ theme }) => theme.palette.primary.main};
-  margin: 0 0 30px 0;
+  font-size: 1.2rem;
+`;
+
+export const QuestionProperty = styled.p`
+  color: ${({ theme }) => theme.palette.secondary.main};
+  margin: 10px 0 0 0;
   font-size: 1.2rem;
 `;
 
 export const Question = styled.p`
   color: ${({ theme }) => theme.palette.background.contrastText};
-  margin: 0 0 20px 0;
+  margin: 30px 0 20px 0;
   font-size: 1.2rem;
 `;
