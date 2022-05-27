@@ -6,7 +6,12 @@ import { MdOutlineLightMode, MdOutlineModeNight } from "react-icons/md";
 import { light } from "./styles/themes/light";
 import { dark } from "./styles/themes/dark";
 import { GlobalStyle } from "./styles/Global.styles";
-import { MainContainer, Title, Score } from "./styles/App.styles";
+import {
+  MainContainer,
+  Title,
+  Score,
+  RangeInputDiv,
+} from "./styles/App.styles";
 import { Button } from "./styles/common.styles";
 import { fetchCategories, fetchQuestions } from "./api/opentdb";
 import { Category, QuestionObject, UserAnswerObject } from "./common/types";
@@ -17,8 +22,6 @@ import QuestionCard from "./components/QuestionCard";
 import ToggleButton from "./components/ToggleButton";
 import CustomSelect from "./components/CustomSelect";
 
-const TOTAL_QUESTIONS: number = 10;
-
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [categories, setCategories] = useState<Category[] | null>(null);
@@ -26,24 +29,25 @@ const App: React.FC = () => {
     null
   );
   const [difficulty, setDifficulty] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<QuestionObject[]>([]);
-  const [questionNr, setQuestionNr] = useState<number>(0);
+  const [totalQuestions, setTotalQuestions] = useState<number>(8);
+  const [questionObjects, setQuestionObjects] = useState<QuestionObject[]>([]);
+  const [questionIndex, setQuestionIndex] = useState<number>(0);
   const [userAnswerObjects, setUserAnswerObjects] = useState<
     UserAnswerObject[]
   >([]);
   const [score, setScore] = useState<number>(0);
-  const [gameOver, setGameOver] = useState<boolean>(true);
+  const [showQuestion, setShowQuestion] = useState<boolean>(false);
   const [theme, setTheme] = useState<ThemeInterface>(dark);
-  const nextBtnRef = useRef<HTMLButtonElement | null>(null);
   const startBtnRef = useRef<HTMLButtonElement | null>(null);
+  const nextBtnRef = useRef<HTMLButtonElement | null>(null);
+  const startNewBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const toggleTheme = (): void => {
     setTheme((prev) => (prev === dark ? light : dark));
   };
 
   const resetGame = (): void => {
-    setGameOver(false);
-    setQuestionNr(0);
+    setQuestionIndex(0);
     setUserAnswerObjects([]);
     setScore(0);
   };
@@ -63,8 +67,8 @@ const App: React.FC = () => {
     try {
       setLoading(true);
       resetGame();
-      const newQuestions: QuestionObject[] = await fetchQuestions(
-        TOTAL_QUESTIONS,
+      const newQuestionObjects: QuestionObject[] = await fetchQuestions(
+        totalQuestions,
         difficulty === DifficultyEnum.ALL ? null : difficulty,
         selectedCategory
           ? selectedCategory?.id === categoryAll.id
@@ -72,7 +76,8 @@ const App: React.FC = () => {
             : selectedCategory.id
           : null
       );
-      setQuestions(newQuestions);
+      setQuestionObjects(newQuestionObjects);
+      setShowQuestion(true);
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -86,34 +91,27 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    if (nextBtnRef.current) scrollToRef(nextBtnRef);
     if (startBtnRef.current) scrollToRef(startBtnRef);
+    if (nextBtnRef.current) scrollToRef(nextBtnRef);
+    if (startNewBtnRef.current) scrollToRef(startNewBtnRef);
   }, [userAnswerObjects]);
 
   const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>): void => {
-    if (!gameOver) {
-      const userAnswer: string = e.currentTarget.value;
-      const correct: boolean =
-        questions[questionNr].correct_answer === userAnswer;
-      if (correct) setScore((prev) => prev + 1);
-      const userAnswerObject: UserAnswerObject = {
-        question: questions[questionNr].question,
-        answer: userAnswer,
-        correct,
-        correctAnswer: questions[questionNr].correct_answer,
-      };
-      setUserAnswerObjects((prev) => [...prev, userAnswerObject]);
-    }
+    const userAnswer: string = e.currentTarget.value;
+    const correct: boolean =
+      questionObjects[questionIndex].correct_answer === userAnswer;
+    if (correct) setScore((prev) => prev + 1);
+    const userAnswerObject: UserAnswerObject = {
+      question: questionObjects[questionIndex].question,
+      answer: userAnswer,
+      correct,
+      correctAnswer: questionObjects[questionIndex].correct_answer,
+    };
+    setUserAnswerObjects((prev) => [...prev, userAnswerObject]);
   };
 
   const nextQuestion = (): void => {
-    const nextQuestionNr: number = questionNr + 1;
-
-    if (nextQuestionNr === TOTAL_QUESTIONS) {
-      setGameOver(true);
-    } else {
-      setQuestionNr(nextQuestionNr);
-    }
+    setQuestionIndex((prev) => prev + 1);
   };
 
   return (
@@ -133,27 +131,38 @@ const App: React.FC = () => {
           css={"margin: 50px auto;"}
           color={theme.palette.background.contrastText}
         />
-        {!loading && !gameOver && (
+        {!loading && showQuestion && (
           <>
-            <Score>score: {score}</Score>
+            {userAnswerObjects.length === questionObjects.length && (
+              <Button
+                ref={startNewBtnRef}
+                onClick={() => setShowQuestion(false)}
+              >
+                <span>START NEW</span>
+              </Button>
+            )}
+            <Score>
+              {userAnswerObjects.length === questionObjects.length && "Final "}
+              score: {score} / {questionObjects.length}
+            </Score>
             <QuestionCard
-              questionNr={questionNr + 1}
-              totalQuestions={TOTAL_QUESTIONS}
-              questionObject={questions[questionNr]}
+              questionNr={questionIndex + 1}
+              totalQuestions={questionObjects.length}
+              questionObject={questionObjects[questionIndex]}
               userAnswerObject={
-                userAnswerObjects ? userAnswerObjects[questionNr] : undefined
+                userAnswerObjects ? userAnswerObjects[questionIndex] : undefined
               }
               callback={checkAnswer}
             />
-            {userAnswerObjects.length === questionNr + 1 &&
-              questionNr !== TOTAL_QUESTIONS - 1 && (
+            {userAnswerObjects.length === questionIndex + 1 &&
+              questionIndex !== questionObjects.length - 1 && (
                 <Button ref={nextBtnRef} onClick={nextQuestion}>
                   <span>Next Question</span>
                 </Button>
               )}
           </>
         )}
-        {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
+        {!loading && !showQuestion && (
           <>
             <CustomSelect
               selected={selectedCategory}
@@ -169,8 +178,20 @@ const App: React.FC = () => {
               getLabel={(option) => option}
               name={"Difficulty"}
             />
+            <RangeInputDiv>
+              <label htmlFor="amount">Total questions: {totalQuestions}</label>
+              <input
+                id="amount"
+                type="range"
+                min="5"
+                max="10"
+                step="1"
+                value={totalQuestions}
+                onChange={(e) => setTotalQuestions(Number(e.target.value))}
+              />
+            </RangeInputDiv>
             <Button ref={startBtnRef} onClick={startTrivia}>
-              <span>{userAnswerObjects.length ? "RESTART" : "START"}</span>
+              <span>START</span>
             </Button>
           </>
         )}

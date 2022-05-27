@@ -25,3 +25,14 @@ export const Score = styled.p`
   font-family: ${({ theme }) => theme.fonts.title};
   color: ${({ theme }) => theme.palette.secondary.main};
 `;
+
+export const RangeInputDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+
+  label,
+  input {
+    width: 45%;
+  }
+`;
