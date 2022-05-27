@@ -21,8 +21,10 @@ import { categoryAll } from "./common/constants";
 import QuestionCard from "./components/QuestionCard";
 import ToggleButton from "./components/ToggleButton";
 import CustomSelect from "./components/CustomSelect";
+import Modal from "./components/Modal";
 
 const App: React.FC = () => {
+  const [theme, setTheme] = useState<ThemeInterface>(dark);
   const [loading, setLoading] = useState<boolean>(false);
   const [categories, setCategories] = useState<Category[] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
@@ -37,7 +39,8 @@ const App: React.FC = () => {
   >([]);
   const [score, setScore] = useState<number>(0);
   const [showQuestion, setShowQuestion] = useState<boolean>(false);
-  const [theme, setTheme] = useState<ThemeInterface>(dark);
+  const [message, setMessage] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
   const startBtnRef = useRef<HTMLButtonElement | null>(null);
   const nextBtnRef = useRef<HTMLButtonElement | null>(null);
   const startNewBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -52,15 +55,29 @@ const App: React.FC = () => {
     setScore(0);
   };
 
+  const showMessage = (message: string): void => {
+    setMessage(message);
+    setShowModal(true);
+  };
+
+  const hideMessage = (): void => {
+    setShowModal(false);
+    setMessage("");
+  };
+
   useEffect(() => {
-    const getCategories = async (): Promise<void> => {
-      const data: Category[] = await fetchCategories();
-      const allCategories: Category[] = [categoryAll, ...data];
-      setCategories(allCategories);
-      setSelectedCategory(categoryAll);
-    };
-    if (!categories) getCategories();
-    setDifficulty(DifficultyEnum.ALL);
+    try {
+      const loadCategories = async (): Promise<void> => {
+        const data: Category[] = await fetchCategories();
+        const allCategories: Category[] = [categoryAll, ...data];
+        setCategories(allCategories);
+        setSelectedCategory(categoryAll);
+      };
+      if (!categories) loadCategories();
+      setDifficulty(DifficultyEnum.ALL);
+    } catch (err) {
+      showMessage("Unable to load categories, please try again later.");
+    }
   }, [categories]);
 
   const startTrivia = async (): Promise<void> => {
@@ -80,7 +97,12 @@ const App: React.FC = () => {
       setShowQuestion(true);
       setLoading(false);
     } catch (err) {
-      console.log(err);
+      if (err instanceof Error) {
+        showMessage(err.message);
+      } else {
+        showMessage("Unable to load questions, please try again later.");
+      }
+      setLoading(false);
     }
   };
 
@@ -194,6 +216,11 @@ const App: React.FC = () => {
               <span>START</span>
             </Button>
           </>
+        )}
+        {showModal && (
+          <Modal onClose={hideMessage}>
+            <p>{message}</p>
+          </Modal>
         )}
       </MainContainer>
     </ThemeProvider>

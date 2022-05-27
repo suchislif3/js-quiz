@@ -4,6 +4,7 @@ interface ButtonProps {
   answerBtn?: boolean;
   correct?: boolean;
   userClicked?: boolean;
+  noMargin?: boolean;
 }
 
 export const Button = styled.button<ButtonProps>`
@@ -16,7 +17,7 @@ export const Button = styled.button<ButtonProps>`
   max-width: 90vw;
   min-width: 200px;
   height: ${({ answerBtn }) => (answerBtn ? "60px" : "50px")};
-  margin: ${({ answerBtn }) => (answerBtn ? "5px 0" : "5% 0")};
+  margin: ${({ answerBtn, noMargin }) => noMargin ? 0 : (answerBtn ? "5px 0" : "5% 0")};
   position: relative;
   color: ${({ theme }) => theme.palette.background.contrastText};
   background: ${({ theme, correct, userClicked }) =>

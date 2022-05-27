@@ -33,6 +33,6 @@ export const RangeInputDiv = styled.div`
 
   label,
   input {
-    width: 45%;
+    width: 49%;
   }
 `;
