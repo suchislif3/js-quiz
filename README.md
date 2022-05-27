@@ -24,7 +24,7 @@ Put yourself to the test in the category of your choice and on different difficu
 React, TypeScript
 
 ## installation and setup
-- clone this repo by running git clone https://github.com/suchislif3/quiz-app.git
+- clone this repo by running `git clone https://github.com/suchislif3/quiz-app.git`
 - `cd quiz-app`
 - `npm install`
 - `npm start`
