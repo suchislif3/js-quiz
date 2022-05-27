@@ -155,19 +155,19 @@ const App: React.FC = () => {
         )}
         {(gameOver || userAnswerObjects.length === TOTAL_QUESTIONS) && (
           <>
-            <span>Category:</span>
             <CustomSelect
               selected={selectedCategory}
               options={categories}
               setSelected={setSelectedCategory}
               getLabel={(option) => option.name}
+              name={"Category"}
             />
-            <span>Difficulty:</span>
             <CustomSelect
               selected={difficulty}
               options={Object.values(DifficultyEnum)}
               setSelected={setDifficulty}
               getLabel={(option) => option}
+              name={"Difficulty"}
             />
             <Button ref={startBtnRef} onClick={startTrivia}>
               <span>{userAnswerObjects.length ? "RESTART" : "START"}</span>

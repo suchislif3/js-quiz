@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {AiFillCaretDown} from "react-icons/ai";
+import { AiFillCaretDown } from "react-icons/ai";
 import { Wrapper, Select, Content, Item } from "../styles/CustomSelect.styles";
 
 interface Props<T> {
@@ -7,6 +7,7 @@ interface Props<T> {
   options: T[] | null;
   setSelected: React.Dispatch<React.SetStateAction<T | null>>;
   getLabel: (option: T) => string;
+  name: string;
 }
 
 const CustomSelect = <T extends {}>({
@@ -14,6 +15,7 @@ const CustomSelect = <T extends {}>({
   options,
   setSelected,
   getLabel,
+  name,
 }: Props<T>) => {
   const [open, setOpen] = useState<boolean>(false);
   const node = useRef<HTMLDivElement | null>(null);
@@ -38,9 +40,10 @@ const CustomSelect = <T extends {}>({
 
   return (
     <Wrapper ref={node}>
+      <span>{name}</span>
       <Select onClick={() => setOpen((prev) => !prev)}>
-        {selected ? getLabel(selected) : "loading..."}
-        <AiFillCaretDown style={{flexShrink: "0"}}/>
+        {options && selected ? getLabel(selected) : "loading..."}
+        <AiFillCaretDown style={{ flexShrink: "0" }} />
       </Select>
       {open && (
         <Content>

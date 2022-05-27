@@ -1,6 +1,9 @@
 import styled from "styled-components";
 
 export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   position: relative;
   width: 90%;
 `;
@@ -25,8 +28,9 @@ export const Content = styled.div`
   border: 1px solid ${({ theme }) => theme.palette.background.contrastText};
   border-top: none;
   position: absolute;
+  top: 100%;
   background: ${({ theme }) => theme.palette.background.main};
-  z-index: 1000;
+  z-index: 2;
   max-height: 200px;
   overflow: auto;
 `;

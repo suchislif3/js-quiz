@@ -7,13 +7,14 @@ interface ButtonProps {
 }
 
 export const Button = styled.button<ButtonProps>`
-  cursor: ${({disabled}) => !disabled && "pointer"};
+  cursor: ${({ disabled }) => !disabled && "pointer"};
   user-select: none;
   transition: all 0.3s;
   border: none;
   font-size: ${({ answerBtn }) => (answerBtn ? "1rem" : "1.2rem")};
   width: ${({ answerBtn }) => (answerBtn ? "100%" : "200px")};
   max-width: 90vw;
+  min-width: 200px;
   height: ${({ answerBtn }) => (answerBtn ? "60px" : "50px")};
   margin: ${({ answerBtn }) => (answerBtn ? "5px 0" : "5% 0")};
   position: relative;
@@ -65,8 +66,10 @@ export const Button = styled.button<ButtonProps>`
     height: 100%;
     z-index: 1;
     transition: all 0.3s;
-    background-color: ${({ theme, correct, userClicked }) => !correct && !userClicked ?
-      `${theme.palette.background.contrastText}20` : "transparent"};
+    background-color: ${({ theme, correct, userClicked }) =>
+      !correct && !userClicked
+        ? `${theme.palette.background.contrastText}20`
+        : "transparent"};
   }
 
   :hover::after {
